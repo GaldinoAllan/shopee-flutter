@@ -18,11 +18,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'MyShop',
         theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.orange,
           fontFamily: 'Lato',
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+              .copyWith(secondary: Colors.orange),
         ),
-        home: ProductsOverviewScreen(),
+        home: const ProductsOverviewScreen(),
         routes: {
           ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
         },
