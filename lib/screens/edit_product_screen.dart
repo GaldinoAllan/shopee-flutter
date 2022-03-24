@@ -41,11 +41,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if ((!_imageUrlController.text.startsWith('http') &&
+              !_imageUrlController.text.startsWith('https')) ||
+          (!_imageUrlController.text.endsWith('.png') &&
+              !_imageUrlController.text.endsWith('.jpeg') &&
+              !_imageUrlController.text.endsWith('.jpg'))) {
+        return;
+      }
       setState(() {});
     }
   }
 
   void _saveForm() {
+    final isValid = _form.currentState?.validate();
+
+    if (!isValid!) {
+      return;
+    }
+
     _form.currentState?.save();
     print(_editedProduct.title);
     print(_editedProduct.description);
@@ -77,6 +90,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_priceFocusNode);
                 },
+                validator: (value) {
+                  if (value == null) {
+                    return null;
+                  }
+                  if (value.isEmpty) {
+                    return "Please provide a value.";
+                  }
+                  return null;
+                },
                 onSaved: (value) {
                   _editedProduct = Product(
                     title: value.toString(),
@@ -95,6 +117,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_descriptionFocusNode);
                 },
+                validator: (value) {
+                  if (value == null) {
+                    return null;
+                  }
+                  if (value.isEmpty) {
+                    return "Please provide a price.";
+                  }
+                  if (double.tryParse(value) == null) {
+                    return "Please provide a valid number.";
+                  }
+                  if (double.parse(value) <= 0) {
+                    return "Please provide a number greater than zero.";
+                  }
+                  return null;
+                },
                 onSaved: (value) {
                   _editedProduct = Product(
                     title: _editedProduct.title,
@@ -110,6 +147,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 maxLines: 3,
                 focusNode: _descriptionFocusNode,
                 keyboardType: TextInputType.multiline,
+                validator: (value) {
+                  if (value == null) {
+                    return null;
+                  }
+                  if (value.isEmpty) {
+                    return "Please provide a description.";
+                  }
+                  if (value.length < 10) {
+                    return "Description should have more than 10 characters.";
+                  }
+                  return null;
+                },
                 onSaved: (value) {
                   _editedProduct = Product(
                     title: _editedProduct.title,
@@ -150,6 +199,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       onFieldSubmitted: (_) => _saveForm(),
                       onEditingComplete: () {
                         setState(() {});
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return null;
+                        }
+                        if (value.isEmpty) {
+                          return "Please provide a image URL.";
+                        }
+                        if (!value.startsWith('http') &&
+                            !value.startsWith('https')) {
+                          return "Please provide a valid URL.";
+                        }
+                        if (!value.endsWith('.png') &&
+                            !value.endsWith('.jpeg') &&
+                            !value.endsWith('.jpg')) {
+                          return "Please provide a valid image URL.";
+                        }
+                        return null;
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
